@@ -2,8 +2,12 @@ import json
 import pandas as pd
 import numpy as np
 from Individuo import Individuo
+from Populacao import Populacao
+import __io
 
 if __name__ == '__main__':
+
+	args = __io.get_args()
 
 	refeicoes = {"CAFE":["bebidas", "frutas", "carbo1"],
 				"LANCHE1":["frutas", "lacteos"],
@@ -15,16 +19,22 @@ if __name__ == '__main__':
 	restricoes = {"Pt": 75, "C": 300, "Df": 25, "Ca": 1000, "Mg": 260,
 				"Mn": 2.3, "P": 700, "Fe": 14, "Na": 2400, "Zn": 7}
 
-	dieta_kcal = 1200
+	dieta_kcal = int(args["dk"])
+	npop = int(args["np"])
+	nger = int(args["ng"])
+	taxa_cruzamento = float(args["tc"])
 
-	produtos = json.load(open("Dataset/produtos.json", "r"))
-
+	produtos_ids = json.load(open("Dataset/produtos.json", "r"))
 	nutrientes_prod = pd.read_csv("Dataset/dataset_formatado.csv")
 
-	print(nutrientes_prod.head())
+	populacao = Populacao(refeicoes, produtos_ids, dieta_kcal, npop, taxa_cruzamento)
 
-	indiv = Individuo(refeicoes, produtos, dieta_kcal)
+	for ger_i in range(0, nger):
+		populacao.avalia_pop(nutrientes_prod, restricoes, penalidade=1000)
+		pais = populacao.torneio()
+		print("pais:", len(pais))
+		break
 
-	indiv.calc_fitness(nutrientes_prod, restricoes, penalidade=100)
+	# indiv = Individuo(refeicoes, produtos, dieta_kcal)
 
-	print(indiv) 
+	# indiv.calc_fitness(nutrientes_prod, restricoes, penalidade=100)
