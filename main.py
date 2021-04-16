@@ -32,13 +32,16 @@ if __name__ == '__main__':
 
 	for ger_i in range(0, nger):
 		populacao.avalia_pop(nutrientes_prod, restricoes, penalidade=1000)
+		melhor_indiv = populacao.get_melhor_indiv() 
 		# print(populacao)
 		pais = populacao.torneio()
 		indiv_interm = populacao.cruzamento(pais, refeicoes, produtos_ids)
 		populacao.substituir_pop(indiv_interm)
-		populacao.exec_elitismo()
+		populacao.exec_elitismo(melhor_indiv)
+		print("Melhor solução encontrada até o momento: ", melhor_indiv.fitness, end="\r")
 		# print("pais:", len(pais))
-		break
+		# input("")
+		# break
 
 	# indiv = Individuo(refeicoes, produtos, dieta_kcal)
 

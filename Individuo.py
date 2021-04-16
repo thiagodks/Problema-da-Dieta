@@ -50,6 +50,30 @@ class Individuo:
 	def calc_fitness(self, nutrientes_prod, restricoes, penalidade):
 		self.fitness = self.__func_objetivo(self.__calc_kcal(nutrientes_prod), nutrientes_prod, restricoes, penalidade)
 
+	def __func_objetivo(self, kcal, nutrientes_prod, restricoes, penalidade):
+		penalizacao = self.__check_nutrientes(self.__get_nutrientes(nutrientes_prod), restricoes)
+		value = 0
+		# print("penalizacao?:", penalizacao)
+		
+		if not penalizacao:
+			value = self.dieta_kcal
+			somatorio = 0
+			for index, idp in enumerate(self.id_produtos):
+				nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
+				kcal = float(nutrientes["kcal"])
+				somatorio += kcal * self.porcoes[index]
+			return np.abs(value - somatorio)
+		
+		else:
+			for nutriente, restricao in restricoes.items():
+				for index, idp in enumerate(self.id_produtos):
+					nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
+					value += np.abs((float(nutrientes[nutriente]) * self.porcoes[index]) - restricao)
+				value /= restricao
+			return np.abs(kcal - self.dieta_kcal) + (value * penalidade)
+		
+		return None
+		
 	def __calc_kcal(self, nutrientes_prod):
 		self.kcal = 0
 		for idp in self.id_produtos:
@@ -77,29 +101,6 @@ class Individuo:
 				return True
 		return False
 
-	def __func_objetivo(self, kcal, nutrientes_prod, restricoes, penalidade):
-		penalizacao = self.__check_nutrientes(self.__get_nutrientes(nutrientes_prod), restricoes)
-		value = 0
-		# print("penalizacao?:", penalizacao)
-		
-		if not penalizacao:
-			value = self.dieta_kcal
-			somatorio = 0
-			for index, idp in enumerate(self.id_produtos):
-				nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
-				kcal = float(nutrientes["kcal"])
-				somatorio += kcal * self.porcoes[index]
-			return np.abs(value - somatorio)
-		
-		else:
-			for nutriente, restricao in restricoes.items():
-				for index, idp in enumerate(self.id_produtos):
-					nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
-					value += np.abs((float(nutrientes[nutriente]) * self.porcoes[index]) - restricao)
-				value /= restricao
-			return np.abs(kcal - self.dieta_kcal) + (value * penalidade)
-		
-		return None
 	
 	def __str__(self):
 		print("\n-> Id (Porção): ", end="[")

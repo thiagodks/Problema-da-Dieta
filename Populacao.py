@@ -1,5 +1,6 @@
 from Individuo import Individuo 
 import random
+import numpy as np
 
 class Populacao:
 	def __init__(self, refeicoes, produtos_ids, dieta_kcal, npop=100, taxa_cruzamento=0.9, taxa_mutacao=0.1):
@@ -28,22 +29,20 @@ class Populacao:
 		
 			# print(p2, p1, self.npop, len(self.individuos))
 			if(self.individuos[p2].fitness > self.individuos[p1].fitness):
-				vencedor = (self.individuos[p1] if random.random() < pv and 
-							(len(pais) > 0 and pais[-1] != self.individuos[p1]) else self.individuos[p2])
+				vencedor = (self.individuos[p1] if random.random() < pv  else self.individuos[p2])
 			else:
-				vencedor = (self.individuos[p2] if random.random() < pv and
-							(len(pais) > 0 and pais[-1] != self.individuos[p2]) else self.individuos[p1])
+				vencedor = (self.individuos[p2] if random.random() < pv else self.individuos[p1])
 			
-			if len(pais) > 0 and pais[-1] == vencedor: 
-				print(pais[-1], vencedor)
-				input("pais iguais para o cruzamento")
+			if len(pais) > 0 and pais[-1] == vencedor: continue
+				# print(pais[-1], vencedor)
+				# input("pais iguais para o cruzamento")
 			pais.append(vencedor)
 			num_pais += 1
 
 		return pais
 
 	def __gerar_filhos(self, pai1, pai2, index_refeicoes, refeicao_troca):
-		individuo = Individuo(init=False, taxa_mutacao=pai1.taxa_mutacao)
+		individuo = Individuo(init=False, taxa_mutacao=pai1.taxa_mutacao, dieta_kcal=pai1.dieta_kcal)
 		if index_refeicoes[refeicao_troca][0] == index_refeicoes[refeicao_troca][1]:
 			individuo.id_produtos = [pai2.id_produtos[index_refeicoes[refeicao_troca][0]]]
 			individuo.porcoes = [pai2.porcoes[index_refeicoes[refeicao_troca][0]]]
@@ -91,24 +90,26 @@ class Populacao:
 		
 		return indiv_interm
 
+	def get_melhor_indiv(self):
+		return min(self.individuos, key=lambda x: x.fitness)
+
 	def substituir_pop(self, indiv_interm):
 		indices_disp = list(range(0, self.npop))
 		num_indiv = len(indiv_interm)
-		
-		print("\n\npopulacao antes", [str(i) for i in self.individuos])
+
+		# print("\n\npopulacao antes", [str(i) for i in self.individuos])
 
 		for novo_indiv in range(0, num_indiv):
 			index = random.choice(indices_disp)
 			self.individuos[index] = indiv_interm[novo_indiv]
 			indices_disp.remove(index)
 		
-		print("\n\npopulacao depois", [str(i) for i in self.individuos])
+		# print("\n\npopulacao depois", [str(i) for i in self.individuos])
 		indiv_interm.clear()
-
-	def exec_elitismo(self):
-		melhor_indiv = min(self.individuos, key=lambda x: x.fitness)
-		self.individuos[random.randint(0, self.npop)] = melhor_indiv
-		print("\n\npopulacao depois do elitismo", [str(i) for i in self.individuos])
+	
+	def exec_elitismo(self, melhor_indiv):
+		self.individuos[np.random.randint(0, self.npop)] = melhor_indiv
+		# print("\n\npopulacao depois do elitismo", [str(i) for i in self.individuos])
 
 	def __str__(self):
 		return " ".join([str(individuo) for individuo in self.individuos])
