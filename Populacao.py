@@ -26,7 +26,7 @@ class Populacao:
 			while p1 == p2:
 				p2 = random.randint(0, self.npop-1)
 		
-			print(p2, p1, self.npop, len(self.individuos))
+			# print(p2, p1, self.npop, len(self.individuos))
 			if(self.individuos[p2].fitness > self.individuos[p1].fitness):
 				vencedor = (self.individuos[p1] if random.random() < pv and 
 							(len(pais) > 0 and pais[-1] != self.individuos[p1]) else self.individuos[p2])
@@ -78,9 +78,14 @@ class Populacao:
 				filho2 = self.__gerar_filhos(pais[i+1], pais[i], index_refeicoes, refeicao_troca)
 				# print("F2 dps", filho2)
 				# input("")
-				filho1.exec_mutacao(refeicoes, produtos_ids)
-				filho2.exec_mutacao(refeicoes, produtos_ids)
 
+				print("Filho 1 antes", filho1)
+				filho1.exec_mutacao(refeicoes, produtos_ids)
+				print("Filho 1 depois", filho1)
+				print("Filho 2 antes", filho2)
+				filho2.exec_mutacao(refeicoes, produtos_ids)
+				print("Filho 2 depois", filho2)
+				input("")
 				indiv_interm.append(filho1)
 				indiv_interm.append(filho2)
 		
