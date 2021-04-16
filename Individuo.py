@@ -51,10 +51,10 @@ class Individuo:
 		self.fitness = self.__func_objetivo(self.__calc_kcal(nutrientes_prod), nutrientes_prod, restricoes, penalidade)
 
 	def valida(self, nutrientes_prod, restricoes):
-		return not self.__check_nutrientes(self.__get_nutrientes(nutrientes_prod), restricoes)
+		return not self.__check_nutrientes(self.get_nutrientes(nutrientes_prod), restricoes)
 	
 	def __func_objetivo(self, kcal, nutrientes_prod, restricoes, penalidade):
-		penalizacao = self.__check_nutrientes(self.__get_nutrientes(nutrientes_prod), restricoes)
+		penalizacao = self.__check_nutrientes(self.get_nutrientes(nutrientes_prod), restricoes)
 		value = 0
 		# print("penalizacao?:", penalizacao, end="\r")
 		
@@ -89,7 +89,7 @@ class Individuo:
 			self.kcal += float(nutrientes["kcal"])
 		return self.kcal
 
-	def __get_nutrientes(self, nutrientes_prod):
+	def get_nutrientes(self, nutrientes_prod):
 		nutrientes_indiv = {"Pt": 0, "C": 0, "Df": 0, "Ca": 0, "Mg": 0,
 					  "Mn": 0, "P": 0, "Fe": 0, "Na": 0, "Zn": 0}
 		
@@ -105,16 +105,8 @@ class Individuo:
 	def __check_nutrientes(self, nutrientes_indiv, restricoes, check_Na=False):
 		for nt, restricao in restricoes.items():
 			if nt == "Na" and nutrientes_indiv[nt] > restricao:
-				# print("restricao:", nt, " nao foi respeitada")
-				# print("nutrientes_indiv:", nutrientes_indiv)
-				# print("restricao:", restricao)
-				# input("")				
 				return True
 			if nt != "Na" and nutrientes_indiv[nt] < restricao: 
-				# print("restricao:", nt, " nao foi respeitada")
-				# print("nutrientes_indiv:", nutrientes_indiv)
-				# print("restricao:", restricao)
-				# input("")
 				return True
 		return False
 
