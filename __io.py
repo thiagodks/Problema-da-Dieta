@@ -9,6 +9,7 @@ def get_args():
 	parser.add_argument('-np', required=False, default=100, type=int, help='Número de Indivíduos da População')
 	parser.add_argument('-ng', required=False, default=100, type=int, help='Número de Gerações')
 	parser.add_argument('-tc', required=False, default=0.9, type=float, help='Taxa de Cruzamento')
+	parser.add_argument('-tm', required=False, default=0.1, type=float, help='Taxa de Mutação')
 	args = vars(parser.parse_args())
 	return args
 

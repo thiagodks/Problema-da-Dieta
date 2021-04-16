@@ -23,16 +23,19 @@ if __name__ == '__main__':
 	npop = int(args["np"])
 	nger = int(args["ng"])
 	taxa_cruzamento = float(args["tc"])
+	taxa_mutacao = float(args["tm"])
 
 	produtos_ids = json.load(open("Dataset/produtos.json", "r"))
 	nutrientes_prod = pd.read_csv("Dataset/dataset_formatado.csv")
 
-	populacao = Populacao(refeicoes, produtos_ids, dieta_kcal, npop, taxa_cruzamento)
+	populacao = Populacao(refeicoes, produtos_ids, dieta_kcal, npop, taxa_cruzamento, taxa_mutacao)
 
 	for ger_i in range(0, nger):
 		populacao.avalia_pop(nutrientes_prod, restricoes, penalidade=1000)
+		# print(populacao)
 		pais = populacao.torneio()
-		print("pais:", len(pais))
+		indiv_interm = populacao.cruzamento(pais, refeicoes, produtos_ids)
+		# print("pais:", len(pais))
 		break
 
 	# indiv = Individuo(refeicoes, produtos, dieta_kcal)
