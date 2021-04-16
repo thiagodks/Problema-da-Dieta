@@ -43,7 +43,7 @@ class Populacao:
 		return pais
 
 	def __gerar_filhos(self, pai1, pai2, index_refeicoes, refeicao_troca):
-		individuo = Individuo(init=False)
+		individuo = Individuo(init=False, taxa_mutacao=pai1.taxa_mutacao)
 		if index_refeicoes[refeicao_troca][0] == index_refeicoes[refeicao_troca][1]:
 			individuo.id_produtos = [pai2.id_produtos[index_refeicoes[refeicao_troca][0]]]
 			individuo.porcoes = [pai2.porcoes[index_refeicoes[refeicao_troca][0]]]
@@ -79,18 +79,36 @@ class Populacao:
 				# print("F2 dps", filho2)
 				# input("")
 
-				print("Filho 1 antes", filho1)
+				# print("Filho 1 antes", filho1)
 				filho1.exec_mutacao(refeicoes, produtos_ids)
-				print("Filho 1 depois", filho1)
-				print("Filho 2 antes", filho2)
+				# print("Filho 1 depois", filho1)
+				# print("Filho 2 antes", filho2)
 				filho2.exec_mutacao(refeicoes, produtos_ids)
-				print("Filho 2 depois", filho2)
-				input("")
+				# print("Filho 2 depois", filho2)
+				# input("")
 				indiv_interm.append(filho1)
 				indiv_interm.append(filho2)
 		
 		return indiv_interm
 
+	def substituir_pop(self, indiv_interm):
+		indices_disp = list(range(0, self.npop))
+		num_indiv = len(indiv_interm)
+		
+		print("\n\npopulacao antes", [str(i) for i in self.individuos])
+
+		for novo_indiv in range(0, num_indiv):
+			index = random.choice(indices_disp)
+			self.individuos[index] = indiv_interm[novo_indiv]
+			indices_disp.remove(index)
+		
+		print("\n\npopulacao depois", [str(i) for i in self.individuos])
+		indiv_interm.clear()
+
+	def exec_elitismo(self):
+		melhor_indiv = min(self.individuos, key=lambda x: x.fitness)
+		self.individuos[random.randint(0, self.npop)] = melhor_indiv
+		print("\n\npopulacao depois do elitismo", [str(i) for i in self.individuos])
 
 	def __str__(self):
 		return " ".join([str(individuo) for individuo in self.individuos])

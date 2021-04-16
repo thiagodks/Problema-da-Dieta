@@ -32,7 +32,6 @@ class Individuo:
 	def exec_mutacao(self, refeicoes, produtos_ids):
 		
 		index = 0
-		print("self.taxa_mutacao", self.taxa_mutacao)
 		for refeicao, produtos in refeicoes.items():
 			
 			if refeicao == "LANCHE1":
@@ -44,7 +43,6 @@ class Individuo:
 			
 			for produto in produtos:
 				if random.random() < self.taxa_mutacao:
-					print("mutacao i:", index)
 					self.id_produtos[index] = random.choice(produtos_ids[produto])
 					self.porcoes[index] = random.uniform(INTERVALO_PORCOES[0], INTERVALO_PORCOES[1])
 				index += 1

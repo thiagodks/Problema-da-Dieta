@@ -35,6 +35,8 @@ if __name__ == '__main__':
 		# print(populacao)
 		pais = populacao.torneio()
 		indiv_interm = populacao.cruzamento(pais, refeicoes, produtos_ids)
+		populacao.substituir_pop(indiv_interm)
+		populacao.exec_elitismo()
 		# print("pais:", len(pais))
 		break
 
