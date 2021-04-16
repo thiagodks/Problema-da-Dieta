@@ -11,7 +11,7 @@ class Populacao:
 	def __init_pop(self, refeicoes, produtos_ids, dieta_kcal, taxa_mutacao):
 		return [Individuo(taxa_mutacao, refeicoes, produtos_ids, dieta_kcal) for _ in range(0, self.npop)]
 
-	def avalia_pop(self, nutrientes_prod, restricoes, penalidade=1000):
+	def avalia_pop(self, nutrientes_prod, restricoes, penalidade=100):
 		for individuo in self.individuos:
 			individuo.calc_fitness(nutrientes_prod, restricoes, penalidade)
 

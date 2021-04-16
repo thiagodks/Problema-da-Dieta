@@ -27,22 +27,20 @@ if __name__ == '__main__':
 
 	produtos_ids = json.load(open("Dataset/produtos.json", "r"))
 	nutrientes_prod = pd.read_csv("Dataset/dataset_formatado.csv")
-
+	nutrientes_prod_dict = {}
+	for index, row in nutrientes_prod.iterrows():
+		nutrientes_prod_dict[int(row["id"])] = row
+	
 	populacao = Populacao(refeicoes, produtos_ids, dieta_kcal, npop, taxa_cruzamento, taxa_mutacao)
 
 	for ger_i in range(0, nger):
-		populacao.avalia_pop(nutrientes_prod, restricoes, penalidade=1000)
+		populacao.avalia_pop(nutrientes_prod_dict, restricoes, penalidade=100)
 		melhor_indiv = populacao.get_melhor_indiv() 
-		# print(populacao)
 		pais = populacao.torneio()
 		indiv_interm = populacao.cruzamento(pais, refeicoes, produtos_ids)
 		populacao.substituir_pop(indiv_interm)
 		populacao.exec_elitismo(melhor_indiv)
-		print("Melhor solução encontrada até o momento: ", melhor_indiv.fitness, end="\r")
-		# print("pais:", len(pais))
-		# input("")
-		# break
+		print("(",ger_i, ") Melhor solução encontrada até o momento: %.2f" % 
+			  melhor_indiv.fitness, melhor_indiv.valida(nutrientes_prod_dict, restricoes), end="\r")
 
-	# indiv = Individuo(refeicoes, produtos, dieta_kcal)
-
-	# indiv.calc_fitness(nutrientes_prod, restricoes, penalidade=100)
+	print()

@@ -50,6 +50,9 @@ class Individuo:
 	def calc_fitness(self, nutrientes_prod, restricoes, penalidade):
 		self.fitness = self.__func_objetivo(self.__calc_kcal(nutrientes_prod), nutrientes_prod, restricoes, penalidade)
 
+	def valida(self, nutrientes_prod, restricoes):
+		return not self.__check_nutrientes(self.__get_nutrientes(nutrientes_prod), restricoes)
+	
 	def __func_objetivo(self, kcal, nutrientes_prod, restricoes, penalidade):
 		penalizacao = self.__check_nutrientes(self.__get_nutrientes(nutrientes_prod), restricoes)
 		value = 0
@@ -59,7 +62,8 @@ class Individuo:
 			value = self.dieta_kcal
 			somatorio = 0
 			for index, idp in enumerate(self.id_produtos):
-				nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
+				nutrientes = nutrientes_prod[idp]
+				# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 				kcal = float(nutrientes["kcal"])
 				somatorio += kcal * self.porcoes[index]
 			return np.abs(value - somatorio)
@@ -67,17 +71,19 @@ class Individuo:
 		else:
 			for nutriente, restricao in restricoes.items():
 				for index, idp in enumerate(self.id_produtos):
-					nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
+					nutrientes = nutrientes_prod[idp]
+					# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 					value += np.abs((float(nutrientes[nutriente]) * self.porcoes[index]) - restricao)
 				value /= restricao
 			return np.abs(kcal - self.dieta_kcal) + (value * penalidade)
 		
 		return None
-		
+
 	def __calc_kcal(self, nutrientes_prod):
 		self.kcal = 0
 		for idp in self.id_produtos:
-			nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
+			nutrientes = nutrientes_prod[idp]
+			# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 			self.kcal += float(nutrientes["kcal"])
 		return self.kcal
 
@@ -87,7 +93,8 @@ class Individuo:
 		
 		for nt in nutrientes_indiv.keys():
 			for index, idp in enumerate(self.id_produtos):
-				nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
+				nutrientes = nutrientes_prod[idp]
+				# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 				nutrientes_indiv[nt] += float(nutrientes[nt]) * self.porcoes[index]
 		
 		# print(nutrientes_indiv)
@@ -95,7 +102,7 @@ class Individuo:
 
 	def __check_nutrientes(self, nutrientes_indiv, restricoes, check_Na=False):
 		for nt, restricao in restricoes.items():
-			if not check_Na and nt == "Na": continue
+			if nt == "Na" and nutrientes_indiv[nt] > restricao: return True
 			if nutrientes_indiv[nt] < restricao: 
 				# print("restricao:", nt, " nao foi respeitada")
 				return True
