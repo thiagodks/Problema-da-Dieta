@@ -27,15 +27,12 @@ class Populacao:
 			while p1 == p2:
 				p2 = random.randint(0, self.npop-1)
 		
-			# print(p2, p1, self.npop, len(self.individuos))
 			if(self.individuos[p2].fitness > self.individuos[p1].fitness):
 				vencedor = (self.individuos[p1] if random.random() < pv  else self.individuos[p2])
 			else:
 				vencedor = (self.individuos[p2] if random.random() < pv else self.individuos[p1])
 			
 			if len(pais) > 0 and pais[-1] == vencedor: continue
-				# print(pais[-1], vencedor)
-				# input("pais iguais para o cruzamento")
 			pais.append(vencedor)
 			num_pais += 1
 
@@ -50,13 +47,8 @@ class Populacao:
 			individuo.id_produtos = pai2.id_produtos[index_refeicoes[refeicao_troca][0]:index_refeicoes[refeicao_troca][1]+1]
 			individuo.porcoes = pai2.porcoes[index_refeicoes[refeicao_troca][0]:index_refeicoes[refeicao_troca][1]+1]
 		
-		# print("indiv id_produtos metade:", individuo)
-		# print(">>", pai1.id_produtos[:index_refeicoes[refeicao_troca][0]])
-		# print(">>", individuo.id_produtos)
-		# print(">>", pai1.id_produtos[index_refeicoes[refeicao_troca][1]+1:])
 		individuo.id_produtos = pai1.id_produtos[:index_refeicoes[refeicao_troca][0]] + individuo.id_produtos + pai1.id_produtos[index_refeicoes[refeicao_troca][1]+1:]
 		individuo.porcoes = pai1.porcoes[:index_refeicoes[refeicao_troca][0]] + individuo.porcoes + pai1.porcoes[index_refeicoes[refeicao_troca][1]+1:]
-		# print("indiv id_produtos antes e dps:", individuo)
 
 		return individuo
 
@@ -68,23 +60,13 @@ class Populacao:
 		for i in range(0, len(pais), 2):
 			if random.random() <= self.taxa_cruzamento:
 				refeicao_troca  = random.choice(refeicoes_aux)
-				# print("refeicao_troca:", refeicao_troca, index_refeicoes[refeicao_troca])
-				# print("P1", pais[i])
-				# print("P2", pais[i+1])
-				filho1 = self.__gerar_filhos(pais[i], pais[i+1], index_refeicoes, refeicao_troca)
-				# print("F1 dps", filho1)
-				# input()
-				filho2 = self.__gerar_filhos(pais[i+1], pais[i], index_refeicoes, refeicao_troca)
-				# print("F2 dps", filho2)
-				# input("")
 
-				# print("Filho 1 antes", filho1)
+				filho1 = self.__gerar_filhos(pais[i], pais[i+1], index_refeicoes, refeicao_troca)
+				filho2 = self.__gerar_filhos(pais[i+1], pais[i], index_refeicoes, refeicao_troca)
+
 				filho1.exec_mutacao(refeicoes, produtos_ids)
-				# print("Filho 1 depois", filho1)
-				# print("Filho 2 antes", filho2)
 				filho2.exec_mutacao(refeicoes, produtos_ids)
-				# print("Filho 2 depois", filho2)
-				# input("")
+
 				indiv_interm.append(filho1)
 				indiv_interm.append(filho2)
 		
@@ -97,19 +79,15 @@ class Populacao:
 		indices_disp = list(range(0, self.npop))
 		num_indiv = len(indiv_interm)
 
-		# print("\n\npopulacao antes", [str(i) for i in self.individuos])
-
 		for novo_indiv in range(0, num_indiv):
 			index = random.choice(indices_disp)
 			self.individuos[index] = indiv_interm[novo_indiv]
 			indices_disp.remove(index)
 		
-		# print("\n\npopulacao depois", [str(i) for i in self.individuos])
 		indiv_interm.clear()
 	
 	def exec_elitismo(self, melhor_indiv):
 		self.individuos[np.random.randint(0, self.npop)] = melhor_indiv
-		# print("\n\npopulacao depois do elitismo", [str(i) for i in self.individuos])
 
 	def __str__(self):
 		return " ".join([str(individuo) for individuo in self.individuos])

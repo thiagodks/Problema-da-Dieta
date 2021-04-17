@@ -4,6 +4,28 @@ import pandas as pd
 import numpy as np
 import argparse
 import pickle
+import __io
+# from main import pd_to_dict
+
+def pd_to_dict(nutrientes_prod):
+	nutrientes_prod_dict = {}
+	for _, row in nutrientes_prod.iterrows():
+		nutrientes_prod_dict[int(row["id"])] = row
+	return nutrientes_prod_dict
+
+def get_alimentos(indiv, nutrientes_prod):
+	alimentos = []
+	for i, idp in enumerate(indiv.id_produtos):
+		info = nutrientes_prod[idp]
+		alimentos.append((info["Alimento"], int(indiv.porcoes[i] * 100) ))
+	return alimentos
+
+restricoes = {"Pt": 75, "C": 300, "Df": 25, "Ca": 1000, "Mg": 260,
+			"Mn": 2.3, "P": 700, "Fe": 14, "Na": 2400, "Zn": 7}
+
+produtos_ids = __io.load_products("Dataset/produtos.json")
+nutrientes_prod = __io.load_data("Dataset/dataset_formatado.csv")
+nutrientes_prod_dict = pd_to_dict(nutrientes_prod)
 
 def get_fitness(fitness):
 	x1 = str(fitness)
@@ -54,25 +76,27 @@ def plot_table(results):
 			"$\\bf{NGER}$": [],
 			"$\\bf{TC}$": [],
 			"$\\bf{TM}$": [],
-			"$\\bf{FIT}$": [],
+			"$\\bf{KCAL}$": [],
 			"$\\bf{MD}$": [],
 			"$\\bf{ME}$": [],
 			"$\\bf{STD}$": []}
 
+	cont = 0
 	for i in results:
-		melhor_fit = min(i[0], key=lambda x: x.fitness).fitness
-		media = np.mean([x.fitness for x in i[0]]) 
-		mediana = np.median([x.fitness for x in i[0]]) 
-		std = np.std([x.fitness for x in i[0]]) 
+		melhor_sol = min(i[0], key=lambda x: x.kcal)
+		media = np.mean([x.kcal for x in i[0]]) 
+		mediana = np.median([x.kcal for x in i[0]]) 
+		std = np.std([x.kcal for x in i[0]]) 
 		table["$\\bf{NPOP}$"].append(i[1]["npop"])
 		table["$\\bf{NGER}$"].append(i[1]["nger"])
 		table["$\\bf{TC}$"].append(i[1]["tc"])
 		table["$\\bf{TM}$"].append(i[1]["tm"])
-		table["$\\bf{FIT}$"].append(melhor_fit)
-		table["$\\bf{ME}$"].append(media)
-		table["$\\bf{MD}$"].append(mediana)
-		table["$\\bf{STD}$"].append(std)
-
+		table["$\\bf{KCAL}$"].append(int(melhor_sol.kcal))
+		table["$\\bf{ME}$"].append(int(media))
+		table["$\\bf{MD}$"].append(int(mediana))
+		table["$\\bf{STD}$"].append(int(std))
+		cont += 1
+		if cont == 10: break
 	df = pd.DataFrame(data=table)
 
 	fig, ax = plt.subplots()
@@ -80,10 +104,10 @@ def plot_table(results):
 	fig.patch.set_visible(False)
 	plt.axis("off")
 	plt.grid("off")
-	ax.set_title("Top-20 Execuções", y=0.99, fontdict={"fontsize": 6}, weight='bold')
+	ax.set_title("Top-10 Execuções", y=0.75, fontdict={"fontsize": 6}, weight='bold')
 
 	ncol = len(table.keys())
-	colors = [["#ccccb3"] * ncol, ["#e0e0d1"] * ncol] * int(len(results)/2)
+	colors = [["#ccccb3"] * ncol, ["#e0e0d1"] * ncol] * int((len(results)-10)/2)
 	the_table = ax.table(cellText=df.values,colLabels=df.columns, cellColours=colors, cellLoc="center", loc="center", colColours =["#78786d"] * ncol)
 	the_table.auto_set_font_size(False)
 	the_table.set_fontsize(6)
@@ -98,5 +122,5 @@ if __name__ == "__main__":
 	parser.add_argument('-f', required=True, type=str, help='Arquivo com os resultados fatoriais')
 	args = vars(parser.parse_args())
 	results = pickle.load(open(args['f'], 'rb'))
-	results.sort(key=lambda x: min(x[0], key=lambda y: y.fitness))
+	results.sort(key=lambda x: min(x[0], key=lambda y: y.kcal).kcal)
 	plot_table(results[:20])

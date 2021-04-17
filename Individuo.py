@@ -55,26 +55,23 @@ class Individuo:
 	
 	def __func_objetivo(self, kcal, nutrientes_prod, restricoes, penalidade):
 		penalizacao = self.__check_nutrientes(self.get_nutrientes(nutrientes_prod), restricoes)
-		value = 0
-		# print("penalizacao?:", penalizacao, end="\r")
 		
 		if not penalizacao:
-			value = self.dieta_kcal
 			somatorio = 0
 			for index, idp in enumerate(self.id_produtos):
 				nutrientes = nutrientes_prod[idp]
-				# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 				kcal = float(nutrientes["kcal"])
-				# print(nutrientes, kcal, self.porcoes[index])
-				# input("")
 				somatorio += kcal * self.porcoes[index]
-			return np.abs(value - somatorio)
+			
+			# if kcal < self.dieta_kcal: 
+				# return np.abs(self.dieta_kcal - somatorio) * penalidade
+			return np.abs(self.dieta_kcal - somatorio)
 		
 		else:
+			value = 0
 			for nutriente, restricao in restricoes.items():
 				for index, idp in enumerate(self.id_produtos):
 					nutrientes = nutrientes_prod[idp]
-					# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 					value += np.abs((float(nutrientes[nutriente]) * self.porcoes[index]) - restricao)
 				value /= restricao
 			return np.abs(kcal - self.dieta_kcal) + (value * penalidade)
@@ -85,7 +82,6 @@ class Individuo:
 		self.kcal = 0
 		for idp in self.id_produtos:
 			nutrientes = nutrientes_prod[idp]
-			# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 			self.kcal += float(nutrientes["kcal"])
 		return self.kcal
 
@@ -96,10 +92,8 @@ class Individuo:
 		for nt in nutrientes_indiv.keys():
 			for index, idp in enumerate(self.id_produtos):
 				nutrientes = nutrientes_prod[idp]
-				# nutrientes = nutrientes_prod.loc[nutrientes_prod['id'] == idp]
 				nutrientes_indiv[nt] += float(nutrientes[nt]) * self.porcoes[index]
 		
-		# print(nutrientes_indiv)
 		return nutrientes_indiv
 
 	def __check_nutrientes(self, nutrientes_indiv, restricoes, check_Na=False):
@@ -110,14 +104,18 @@ class Individuo:
 				return True
 		return False
 
-	
+	def get_alimentos(self, nutrientes_prod):
+		alimentos = []
+		for idp in self.id_produtos:
+			info = nutrientes_prod[idp]
+			alimentos.append(info["Alimento"])
+		return alimentos
+		
 	def __str__(self):
 		print("\n-> Id (Porção): ", end="[")
 		
 		for i, idp in enumerate(self.id_produtos):
-			print("i:",i,"-",idp, end="#")
-			# if i != len(self.id_produtos)-1: print("i:",i," ",idp, "-> (%.1f)" % self.porcoes[i], end=", ")
-			# else: print(idp, "(%.1f)" % self.porcoes[i], end="")
-		return "\n"
-		# return "]\n" + ("-> Kcal: %.2f" % self.kcal) + ("\n-> Fitness: %.2f" % self.fitness) + "\n"		
-		# return ("\n-> Kcal: %.2f" % self.kcal) + ("\n-> Fitness: %.2f" % self.fitness) + "\n"		
+			if i != len(self.id_produtos)-1: print("i:",i," ",idp, "-> (%.1f)" % self.porcoes[i], end=", ")
+			else: print(idp, "(%.1f)" % self.porcoes[i], end="")
+
+		return "]\n" + ("-> Kcal: %.2f" % self.kcal) + ("\n-> Fitness: %.2f" % self.fitness) + "\n"		

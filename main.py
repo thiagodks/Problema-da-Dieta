@@ -4,6 +4,8 @@ from Populacao import Populacao
 import __io
 import plot_charts as pc
 from tqdm import tqdm
+import pickle
+import sys
 
 def gen_log(populacao):
 	melhor_indiv = populacao.get_melhor_indiv()
@@ -53,12 +55,8 @@ if __name__ == '__main__':
 	log_pop = []
 
 	for ger_i in range(0, nger):
-		populacao.avalia_pop(nutrientes_prod_dict, restricoes, penalidade=1000)
-
+		populacao.avalia_pop(nutrientes_prod_dict, restricoes, penalidade=100)
 		log_pop.append(gen_log(populacao))
-		# print("fitness mediana:", np.median([i.fitness for i in populacao.individuos]))
-		# input("")
-
 		melhor_indiv = populacao.get_melhor_indiv() 
 		pais = populacao.torneio()
 		indiv_interm = populacao.cruzamento(pais, refeicoes, produtos_ids)
@@ -70,6 +68,4 @@ if __name__ == '__main__':
 	print("\n\nRestrições:", restricoes)
 	print("\nDieta:", populacao.get_melhor_indiv().get_nutrientes(nutrientes_prod_dict), "\n")
 	print("\nFitness: %.2f" % populacao.get_melhor_indiv().fitness, " - Kcal: %.2f" % populacao.get_melhor_indiv().kcal)
-	print(populacao.get_melhor_indiv().id_produtos, len(populacao.get_melhor_indiv().id_produtos))
-	print(populacao.get_melhor_indiv().porcoes, len(populacao.get_melhor_indiv().porcoes))
 	pc.plot_graphics(log_pop, parametros)
